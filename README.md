@@ -9,95 +9,84 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
 [![Live Demo](https://img.shields.io/badge/Demo-relay.arifcodes.com-orange.svg)](https://relay.arifcodes.com)
 
-**Add Telegram to your product. In an afternoon.**
+**Self-hostable Telegram messaging infrastructure for SaaS products.**
 
-Relay Gateway is the multi-tenant layer between your product and Telegram. You send a customer a
-link; they pick a bot name; Telegram creates a bot in their name; you then message their
-end-users through it.
+Relay Gateway lets a software vendor give each tenant its own Telegram bot, then send messages
+through one API. It handles bot onboarding, tenant-scoped keys, signed webhooks, message logs,
+rate limits, a dashboard, and MCP tools.
 
-> **Live Preview:** Explore the production instance at **[relay.arifcodes.com](https://relay.arifcodes.com)**, or test merchant authentication at **[relay.arifcodes.com/login](https://relay.arifcodes.com/login)**.
+### How it works
 
-What the layer gives you is the part that takes a month if you build it yourself:
+1. The software vendor creates a tenant and sends its business a one-time connect link.
+2. The tenant chooses a bot name; Telegram creates a bot that belongs to that tenant.
+3. The software vendor sends messages through Relay Gateway, and the tenant's bot delivers them to
+   end users.
 
-- **One API for every customer.** Each customer is a tenant with its own scoped key, and the
-  isolation is enforced for you.
-- **Onboarding that does not leak credentials.** No customer pastes a token into your product, and
-  neither do you. We fetch it through Telegram's own managed-bot flow and encrypt it.
-- **Your customer keeps their sender.** Their name, their control, revocable by them.
-- **Events, not polling.** Every send, failure and connection is pushed to your URL, signed, and
-  written to a per-tenant message log.
-- **Rate limits handled.** One shared limiter, `retry_after` honoured exactly, so your bot does
-  not get muted.
-- **A console and an MCP server.** Both included; neither is another thing to build.
+No one needs to paste a bot token into your product. Relay Gateway obtains it through Telegram's
+managed-bot flow and encrypts it at rest.
 
-No Telegram Business approval. No per-message fees. Nobody pastes a token into a form.
+> **Live preview:** Explore [relay.arifcodes.com](https://relay.arifcodes.com) or try merchant
+> sign-in at [relay.arifcodes.com/login](https://relay.arifcodes.com/login).
 
-```
-L0  Telegram            the infrastructure. we do not own it.
-L1  Relay Gateway       this platform. API, webhooks, MCP, dashboard.
-L2  The SaaS vendor     deploys Relay Gateway. calls our API.
-L3  The tenant          L2's customer. a business. connects its own bot.
-L4  The end user        the person who receives the message.
-                         never sees this platform.
-```
+## Try it locally
 
-"Customer" means two different people here: L2's customer is L3, and L3's customer is L4. The
-difference is the whole product — the end user must receive the message from *the business they
-chose*, not from a shared platform account.
-
----
-
-## Why Telegram, and why not a shared bot
-
-A plain bot can only talk to people who opened a chat with it. That kills the use case most
-products want: telling a customer their order shipped.
-
-So Relay Gateway does not ask your customer for a bot. It asks Telegram to create one *for* them:
-
-1. You create a tenant and mint a connect link.
-2. Your customer opens the link and picks a bot name.
-3. We hand back a `t.me/newbot` deep link. Telegram does the creating.
-4. Telegram tells our manager bot about it; we fetch the token and seal it.
-5. You send.
-
-The customer keeps their bot and can revoke us at any time. We hold the token so we can send on
-their behalf. That is the sanctioned path — Telegram ships `getManagedBotToken` for exactly this,
-and collecting a customer's token to proxy their traffic is explicitly forbidden by the Bot
-Developer ToS (§5.2(f)).
-
-## What it does not do (yet)
-
-Telegram also lets a bot read and reply to a *business account*'s DMs — a "Secretary". That is a
-different product surface with a hard constraint: the bot may only reply in private chats that had
-an incoming message in the **last 24 hours**. It is a conversation mechanism, never a campaign
-mechanism. Mode B is designed for in `docs/plan.md` and the storage columns already exist, but it
-is not in v0.1.
-
-## Install
+Requires Node.js 22.16 or later.
 
 ```sh
 git clone https://github.com/arif-js/relay-gateway
 cd relay-gateway
 npm install
-npm run build
-```
-
-Requires Node ≥ 22.16. Runtime dependencies: the MCP SDK and zod. Nothing else.
-
-## Try it in 30 seconds
-
-```sh
 RELAY_DEMO=1 npm run dev
 ```
 
-Demo mode fakes Telegram in-process: nothing leaves your machine, and the whole flow — create a
-tenant, mint a link, connect a bot, send a message — is clickable in the browser.
+Open <http://localhost:8787>, sign in to the console with the key printed in the terminal, and
+follow the demo flow. Demo mode uses a fake Telegram client in-process: it makes no Telegram
+network calls.
 
-Open <http://localhost:8787>, sign in to the console with the printed key, and follow the flow.
+## What you get
+
+- **One API, isolated tenants.** Each tenant has a scoped key that cannot access another tenant's
+  data.
+- **Zero-paste bot onboarding.** Telegram creates the tenant's bot through its managed-bot flow;
+  Relay Gateway encrypts the token.
+- **The tenant's own sender.** Messages come from the bot the tenant created and controls, not a
+  shared platform bot.
+- **Signed events and message logs.** Delivery, failure, and connection events are pushed to your
+  webhook and recorded per tenant.
+- **Shared rate limiting.** The rate limiter honors Telegram's `retry_after` value.
+- **Dashboard and MCP server.** A browser console and tools for MCP-compatible AI clients are
+  included.
+
+## Who is who
+
+- **Software vendor:** deploys Relay Gateway and calls its API.
+- **Tenant:** the vendor's business user; connects and controls its own bot.
+- **End user:** the person who messages or receives messages from the tenant's bot.
+
+When this README says “tenant,” it means the business using your software. “End user” means that
+business's own user.
+
+## Why managed bots
+
+A Telegram bot can message people only after they have started a chat with it. Relay Gateway
+therefore does not use one shared bot: each tenant connects its own bot through Telegram's
+managed-bot flow.
+
+The software vendor creates a tenant and connect link; the tenant chooses a bot name and completes
+the flow in Telegram. Relay Gateway obtains and encrypts the bot token, then sends messages on the
+tenant's behalf. The tenant owns the bot and can revoke access. This avoids asking the tenant to
+paste a token into the software vendor's product.
+
+## Not supported yet: Telegram Business
+
+Replying as a Telegram Business account is a separate, future capability. Telegram limits those
+replies to private chats with an incoming message in the **last 24 hours**. It is a conversation
+feature, not a campaign feature, and is not available in v0.1.
 
 ## Run it for real
 
 ```sh
+npm run build
 export RELAY_MANAGER_BOT_TOKEN=123456:AA...
 export RELAY_MANAGER_BOT_USERNAME=your_manager_bot
 export RELAY_PUBLIC_URL=https://relay.example.com
@@ -108,8 +97,7 @@ node dist/cli.js serve
 Two things to set up first:
 
 1. **A manager bot.** Create one with [@BotFather](https://t.me/botfather) and turn on *Bot
-   Management Mode* (and *Secretary Mode*, when Mode B lands). This is the bot that creates and
-   holds the managed bots.
+   Management Mode*. This is the bot that creates and manages the tenant bots.
 2. **A webhook.** Point Telegram at `https://relay.example.com/v1/telegram/webhook` for the
    manager bot, with the secret in `RELAY_TELEGRAM_WEBHOOK_SECRET`. Telegram only delivers
    webhooks over HTTPS on ports 443, 80, 88 and 8443.
@@ -174,18 +162,25 @@ Events: `message.sent`, `message.failed`, `message.received`, `tenant.connected`
 `message.received` fires when an end user writes to a tenant's bot, including tapping `/start`.
 It carries their `chat_id`, which is how you get the id you need to message them.
 
-## Autonomous AI Customer Support Agent Example
+## AI support example
 
-An end-to-end autonomous customer support bot is included in [`examples/ai-sales-agent.mjs`](examples/ai-sales-agent.mjs).
+[`examples/ai-sales-agent.mjs`](examples/ai-sales-agent.mjs) demonstrates a webhook-driven support
+agent. It uses an example order and store knowledge base defined in the script; it does not connect
+to an order database.
 
 ```text
-[Customer] ➔ (Telegram) ➔ [Relay Gateway] ➔ (Signed Webhook) ➔ [SalesShop AI Agent] ➔ (Relay API) ➔ [Telegram] ➔ [Customer]
+[End user] ➔ (Telegram) ➔ [Relay Gateway] ➔ (Signed Webhook) ➔ [Support agent] ➔ (Relay API) ➔ [Telegram] ➔ [End user]
 ```
 
-When a customer messages the merchant's bot on Telegram:
-1. Relay Gateway pushes the `message.received` event to the merchant's webhook over HTTPS.
-2. The AI Agent (`examples/ai-sales-agent.mjs`) verifies the HMAC signature, queries the customer order database (order status, tracking ETA, return policies), and generates an intelligent contextual response with Gemini, OpenAI, or the built-in matcher.
-3. The agent dispatches the response via `POST /v1/messages` through Relay Gateway, delivering it instantly back to the customer on Telegram.
+When an end user messages a tenant's bot:
+1. Relay Gateway posts a signed `message.received` event to the configured webhook.
+2. The example verifies the signature and generates a reply using the in-script sample knowledge
+   base. Gemini and OpenAI are optional; without their API keys, the built-in matcher is used.
+3. The agent sends its reply through Relay Gateway, which delivers it from the tenant's bot.
+
+If you enable Gemini or OpenAI, the example sends the incoming message and its prompt context to
+that provider. Replace the sample data carefully, and do not send real user or tenant data to a
+third party without the required authorization.
 
 Run it locally:
 ```sh
@@ -232,9 +227,9 @@ There is also a `relay://tenants` resource.
 ## Rate limits
 
 Telegram's limits are enforced for you by one shared limiter: about 1 message/second per chat,
-20/minute per group, 30/second overall. On a 429 we sleep exactly as long as Telegram says. If
-you need more than 30/second, Telegram's Paid Broadcasts cost 0.1 Stars per message, charged to
-the bot's balance.
+20/minute per group, 30/second overall. On a 429 we sleep exactly as long as Telegram says.
+Standard Bot API sending has no per-message fee. For higher throughput, Telegram's Paid Broadcasts
+may cost 0.1 Stars per message, charged to the bot's balance.
 
 A bot can only message people who have started a chat with it. That is Telegram's rule, not ours.
 
@@ -246,16 +241,15 @@ Free, for now. Both plans.
 |---|---|---|
 | Price | Free | Free |
 | Tenants | Unlimited | 3 |
-| Messages/month | Unlimited | 2,000 |
+| Messages/month per tenant | Unlimited | 2,000 |
 | Webhooks | Unlimited | 5 |
 
 Telegram charges nothing for normal sending, so the whole platform costs **us** one $5-a-month
 server and a domain. While there are no users to serve there is nothing to charge for, so the
 hosted plan is free too.
 
-The hosted plan still has ceilings — three tenants, 2,000 messages a month — so one busy customer
-cannot eat the whole of a $5 server. If you need more than that, self-host it: unlimited, no
-limits, AGPL-3.0, forever.
+The hosted plan allows up to three tenants, with a separate 2,000-message monthly limit for each
+tenant. If you need different limits or more control, self-host it under AGPL-3.0.
 
 There is no billing integration yet. The limits are enforced in code; the money is not collected.
 When enough users show up to want a real tier, that is a decision to make, and `priceUsd` in
@@ -356,5 +350,5 @@ real client/server pair, and the web UI.
 
 ## License
 
-AGPL-3.0. Self-host it, host it for your customers, or run it as a service — if you modify it and
+AGPL-3.0. Self-host it, host it for your tenants, or run it as a service — if you modify it and
 run it as a service, publish your modifications.
