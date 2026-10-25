@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: The generated assets are committed and current
+        run: git diff --exit-code -- src/ui/assets.generated.ts
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the image
+        run: docker build -t relay-gateway .
+      - name: The image starts and answers
+        run: |
+          docker run -d --name relay -p 8787:8787 \
+            -e RELAY_DEMO=1 -e RELAY_ADMIN_KEY=rg_admin_ci relay-gateway
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:8787/healthz > /dev/null; then
+              echo "healthy"
+              curl -s http://127.0.0.1:8787/healthz
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "the container never became healthy"
+          docker logs relay
+          exit 1

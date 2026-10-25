@@ -1,0 +1,21 @@
+---
+description: Apply the Warm Editorial Developer design system to client and web UI components
+globs: client/**, src/ui/**, **/*.html, **/*.css, **/*.tsx
+alwaysApply: false
+---
+
+# Warm Editorial Developer Design System
+
+When building, styling, or refactoring UI components, marketing pages, documentation, or dashboard views in `client/` or `src/ui/`:
+
+- Follow the design specification in `.agents/skills/warm-editorial-design/SKILL.md`.
+- **Palette**: Warm paper/ivory background (`#FAF8F5`), sand container surface (`#F4EFEB`), deep charcoal ink (`#18181B`), hairline border (`#E6DFD5`), and vermilion accent (`#D84F1D` / `#a83200` with subtle tint `#FBF1EB`).
+- **Typography**: Display serif (`EB Garamond`), clean sans body (`Hanken Grotesk`), monospaced labels and code (`JetBrains Mono`).
+- **Layout**: 12-column grid capped at 1120px max width. Section cadence is 5rem (`space-3xl`).
+- **Shapes**: 4px base radius for controls/inputs/buttons, 8px for container cards. Strictly avoid cartoonish bubble shapes.
+- **Elevation**: Tonal layering (canvas base -> sand container -> white card) with 1px hairline delimiters. No heavy drop-shadows or neon gradients.
+
+For full component blueprints (buttons, bento feature cards, terminal multiplexers, sequential lists), consult:
+- `.agents/skills/warm-editorial-design/SKILL.md`
+- Prototype example: `.agents/skills/warm-editorial-design/examples/prototype.html`
+- Token reference: `.agents/skills/warm-editorial-design/references/design-tokens.md`

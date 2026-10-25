@@ -1,0 +1,18 @@
+---
+description: Core architecture rules, invariants, and guidelines for Relay Gateway
+globs: *
+alwaysApply: true
+---
+
+# Relay Gateway Architecture & Coding Rules
+
+Read and follow `AGENTS.md` — it is the single source of truth for the project.
+
+Key Invariants:
+1. **Envelope everywhere**: Success `{ ok: true, data }` or failure `{ ok: false, error: { code, message, hint? } }`.
+2. **Closed error code set**: `BAD_INPUT`, `UNAUTHORIZED`, `NOT_FOUND`, `CONFLICT`, `NOT_CONNECTED`, `RATE_LIMITED`, `PLAN_LIMIT`, `TELEGRAM_ERROR`, `INTERNAL`.
+3. **Tenant isolation**: `rg_live_...` can only access its own tenant's rows. Platform key `rg_admin_...` can cross tenants.
+4. **Bot tokens are write-only**: Encrypted at rest (AES-256-GCM), never returned in any response, log line, or tool output.
+5. **Shared rate limiter**: Telegram's 429 `retry_after` must be honored exactly.
+6. **Web UI**: Server-rendered HTML uses the `html` tag for escaping. Never interpolate raw HTML or HTML into attributes.
+7. **Design system**: Follow the Warm Editorial Developer design system in `.agents/skills/warm-editorial-design/SKILL.md`.

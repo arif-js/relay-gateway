@@ -1,0 +1,24 @@
+@import "raditail/theme/tailwind.css";
+@import "raditail/theme/styles.css";
+
+:root {
+  --serif: "EB Garamond", "Newsreader", "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+  --font-serif: var(--serif);
+  --sans: "Hanken Grotesk", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+html,
+body {
+  font-family: var(--sans);
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+.font-serif {
+  font-family: var(--serif);
+}
+
+.font-mono {
+  font-family: var(--mono);
+}

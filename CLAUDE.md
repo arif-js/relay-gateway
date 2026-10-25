@@ -1,0 +1,1 @@
+# CLAUDE\n\nThis file imports the project's agent instructions. Read **AGENTS.md** — it is the single\nsource of truth for every tool. Edit **AGENTS.md**, never this file.\n\n@AGENTS.md\n

@@ -1,0 +1,13 @@
+# Relay Gateway — Cursor Rules
+
+Read and follow `AGENTS.md` as the single source of truth for all coding patterns and architectural invariants.
+
+For UI and frontend tasks:
+- Follow `.agents/skills/warm-editorial-design/SKILL.md` for the Warm Editorial Developer design system.
+- Follow `.agents/skills/change-web-ui/SKILL.md` for server-rendered HTML and UI rules.
+
+For API, MCP, and Core tasks:
+- Follow `.agents/skills/add-api-route/SKILL.md`
+- Follow `.agents/skills/add-mcp-tool/SKILL.md`
+- Follow `.agents/skills/change-connection-flow/SKILL.md`
+- Follow `.agents/skills/change-storage/SKILL.md`
