@@ -7,7 +7,7 @@
 // module from the same files keeps one source of truth and works everywhere.
 //
 // Run by `npm run build`, `npm test`, and `npm run typecheck`. The generated
-// module is a local build artifact and is intentionally not committed.
+// module is committed so serverless bundlers can include it in their output.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -69,7 +69,8 @@ parts.push(`export const main_css = ${JSON.stringify(mainCss)};`);
 
 const banner = `// GENERATED FILE — do not edit.
 //
-// Run \`npm run build\` to regenerate it from the UI sources.
+// Run \`npm run build\` to regenerate it from the UI sources. Commit the
+// generated file so deployments receive the exact module imported by the server.
 `;
 
 writeFileSync(target, `${banner}\n${parts.join('\n')}\n`);

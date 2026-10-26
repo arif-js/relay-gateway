@@ -151,8 +151,9 @@ These are verified problems with the chosen stack. Don't rediscover them:
 - **The UI assets are inlined at build time.** `scripts/gen-assets.mjs` writes
   `src/ui/assets.generated.ts` from `src/ui/styles.css` and `src/ui/app.js`, and the server
   imports that module. It has to be this way: a serverless bundler cannot see a file read with a
-  dynamic path. The generated module is ignored by Git and recreated by `npm run build`,
-  `npm test`, and `npm run typecheck`. **Edit the CSS and the JS, never the generated file.**
+  dynamic path. The generated module is committed so serverless bundlers include it. It is
+  recreated by `npm run build`, `npm test`, and `npm run typecheck`; CI checks it is current.
+  **Edit the CSS and the JS, never the generated file.**
 - **`libsql` is a native module.** It is loaded with `createRequire` only when
   `RELAY_DATABASE_URL` is set, so a self-hoster who never uses a remote database never needs the
   binary. On Vercel the binary has to be traced into the function, which is what
