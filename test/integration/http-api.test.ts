@@ -75,7 +75,7 @@ describe('the HTTP API', () => {
       ['/favicon-32x32.png', 'favicon-32x32.png', 'image/png'],
       ['/favicon.ico', 'favicon.ico', 'image/x-icon'],
       ['/apple-touch-icon.png', 'apple-touch-icon.png', 'image/png'],
-    ]) {
+    ] as const) {
       const response = await fetch(`${base}${url}`);
       expect(response.status).toBe(200);
       expect(response.headers.get('content-type')).toContain(contentType);
