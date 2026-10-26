@@ -34,8 +34,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: The generated assets are committed and current
-        run: git diff --exit-code -- src/ui/assets.generated.ts
+      - name: Generated assets are build artifacts
+        run: test -s src/ui/assets.generated.ts && git check-ignore --no-index --quiet src/ui/assets.generated.ts
 
   docker:
     runs-on: ubuntu-latest

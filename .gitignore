@@ -2,6 +2,7 @@ node_modules/
 dist/
 build/
 coverage/
+/src/ui/assets.generated.ts
 *.log
 .env
 .env.local

@@ -54,6 +54,7 @@
     "build": "vite build && node scripts/gen-assets.mjs && tsup",
     "build:client": "vite build",
     "dev": "vite build && node scripts/gen-assets.mjs && RELAY_DEMO=1 tsx src/cli.ts serve",
+    "pretest": "vite build && node scripts/gen-assets.mjs",
     "start": "node dist/cli.js serve",
     "typecheck": "node scripts/gen-assets.mjs && tsc --noEmit",
     "lint": "biome check .",
