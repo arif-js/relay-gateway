@@ -89,7 +89,6 @@ export function Navbar({ currentPath, navigate, hasClerk = false }: NavbarProps)
                     : 'text-[#52525b] font-medium hover:text-[#18181b] hover:bg-white/60'
                 }`}
               >
-                {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#b4532a]" />}
                 <span>{link.label}</span>
               </a>
             );
@@ -172,10 +171,7 @@ export function Navbar({ currentPath, navigate, hasClerk = false }: NavbarProps)
                     : 'text-[#52525b] font-medium hover:text-[#18181b] hover:bg-[#f4efeb]/60'
                 }`}
               >
-                <span className="flex items-center gap-2">
-                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#b4532a]" />}
-                  {link.label}
-                </span>
+                <span>{link.label}</span>
                 <ArrowRight className="w-3.5 h-3.5 text-[#71717a]" />
               </a>
             );
