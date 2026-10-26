@@ -39,6 +39,19 @@ parts.push(`export const favicon_png = ${JSON.stringify(faviconPngBase64)};`);
 const faviconSvg = readFileSync(faviconSvgPath, 'utf8');
 parts.push(`export const favicon_svg = ${JSON.stringify(faviconSvg)};`);
 
+const publicFaviconDir = join(root, 'client', 'public');
+const publicFavicons = [
+  ['favicon_16_png', 'favicon-16x16.png'],
+  ['favicon_32_png', 'favicon-32x32.png'],
+  ['favicon_ico', 'favicon.ico'],
+  ['apple_touch_icon', 'apple-touch-icon.png'],
+];
+
+for (const [name, file] of publicFavicons) {
+  const content = readFileSync(join(publicFaviconDir, file)).toString('base64');
+  parts.push(`export const ${name} = ${JSON.stringify(content)};`);
+}
+
 // React SPA assets from Vite
 const mainJsPath = join(root, 'client', 'dist', 'assets', 'main.js');
 const mainCssPath = join(root, 'client', 'dist', 'assets', 'main.css');

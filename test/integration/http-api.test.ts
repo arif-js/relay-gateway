@@ -1,4 +1,7 @@
+import { readFileSync } from 'node:fs';
 import type { Server } from 'node:http';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createHttpServer } from '../../src/http/server.js';
 import { api, cleanupHarness, createHarness, type Harness } from '../harness.js';
@@ -33,6 +36,10 @@ describe('the HTTP API', () => {
     const html = await response.text();
     expect(html).toContain('Relay Gateway');
     expect(html).toContain('<!doctype html>');
+    expect(html).toContain('href="/favicon-32x32.png"');
+    expect(html).toContain('href="/favicon-16x16.png"');
+    expect(html).toContain('href="/favicon.ico"');
+    expect(html).toContain('href="/apple-touch-icon.png"');
   });
 
   it('serves the stylesheet and the client script and the logo', async () => {
@@ -61,6 +68,21 @@ describe('the HTTP API', () => {
     const faviconIco = await fetch(`${base}/favicon.ico`);
     expect(faviconIco.status).toBe(200);
     expect(faviconIco.headers.get('content-type')).toContain('image/x-icon');
+
+    const publicDir = fileURLToPath(new URL('../../client/public/', import.meta.url));
+    for (const [url, file, contentType] of [
+      ['/favicon-16x16.png', 'favicon-16x16.png', 'image/png'],
+      ['/favicon-32x32.png', 'favicon-32x32.png', 'image/png'],
+      ['/favicon.ico', 'favicon.ico', 'image/x-icon'],
+      ['/apple-touch-icon.png', 'apple-touch-icon.png', 'image/png'],
+    ]) {
+      const response = await fetch(`${base}${url}`);
+      expect(response.status).toBe(200);
+      expect(response.headers.get('content-type')).toContain(contentType);
+      expect(Buffer.from(await response.arrayBuffer())).toEqual(
+        readFileSync(join(publicDir, file)),
+      );
+    }
   });
 
   it('walks a tenant from created to connected to sending', async () => {

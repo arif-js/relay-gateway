@@ -18,6 +18,10 @@ describe('the generated assets', () => {
     expect(generated).toContain('export const logo_png');
     expect(generated).toContain('export const favicon_png');
     expect(generated).toContain('export const favicon_svg');
+    expect(generated).toContain('export const favicon_16_png');
+    expect(generated).toContain('export const favicon_32_png');
+    expect(generated).toContain('export const favicon_ico');
+    expect(generated).toContain('export const apple_touch_icon');
     expect(generated).toContain('export const main_js');
     expect(generated).toContain('export const main_css');
   });

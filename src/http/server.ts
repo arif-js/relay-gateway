@@ -10,7 +10,11 @@ import { type Logger, redact } from '../logger.js';
 // so the same bundle works on a normal host and on a serverless one, where a
 // file read with a dynamic path would not be included.
 import {
+  apple_touch_icon as appleTouchIconBase64,
   app_js as clientScript,
+  favicon_16_png as favicon16PngBase64,
+  favicon_32_png as favicon32PngBase64,
+  favicon_ico as faviconIcoBase64,
   favicon_png as faviconPngBase64,
   favicon_svg as faviconSvg,
   logo_png as logoBase64,
@@ -89,6 +93,26 @@ function handleRequest(deps: ServerDeps, req: IncomingMessage, res: ServerRespon
   });
 
   const faviconBuffer = Buffer.from(faviconPngBase64, 'base64');
+  const favicon16Buffer = Buffer.from(favicon16PngBase64, 'base64');
+  const favicon32Buffer = Buffer.from(favicon32PngBase64, 'base64');
+  const faviconIcoBuffer = Buffer.from(faviconIcoBase64, 'base64');
+  const appleTouchIconBuffer = Buffer.from(appleTouchIconBase64, 'base64');
+
+  for (const [path, contentType, buffer] of [
+    ['/favicon-16x16.png', 'image/png', favicon16Buffer],
+    ['/favicon-32x32.png', 'image/png', favicon32Buffer],
+    ['/favicon.ico', 'image/x-icon', faviconIcoBuffer],
+    ['/apple-touch-icon.png', 'image/png', appleTouchIconBuffer],
+  ] as const) {
+    router.get(path, ({ res }) => {
+      res.writeHead(200, {
+        'content-type': contentType,
+        'cache-control': 'public, max-age=300',
+      });
+      res.end(buffer);
+    });
+  }
+
   router.get('/assets/favicon.png', ({ res }) => {
     res.writeHead(200, {
       'content-type': 'image/png',
@@ -103,14 +127,6 @@ function handleRequest(deps: ServerDeps, req: IncomingMessage, res: ServerRespon
       'cache-control': 'public, max-age=86400',
     });
     res.end(faviconSvg);
-  });
-
-  router.get('/favicon.ico', ({ res }) => {
-    res.writeHead(200, {
-      'content-type': 'image/x-icon',
-      'cache-control': 'public, max-age=86400',
-    });
-    res.end(faviconBuffer);
   });
 
   router.get('/favicon.png', ({ res }) => {

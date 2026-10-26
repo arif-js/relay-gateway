@@ -54,8 +54,10 @@ export function layout(options: LayoutOptions): string {
 <meta name="description" content="${escapeHtml(description ?? 'Multi-tenant Telegram messaging infrastructure for developers.')}">
 <link rel="stylesheet" href="/assets/styles.css">
 <link rel="stylesheet" href="/assets/main.css">
-<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
-<link rel="alternate icon" type="image/png" href="/assets/favicon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 </head>
 <body class="bg-[#fbf9f6] text-[#1a1714]">
 <div id="root">
