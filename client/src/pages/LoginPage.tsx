@@ -53,7 +53,7 @@ function ClerkAuthView({
 
   // Not signed in -> Render Clerk Sign In / Sign Up
   return (
-    <div className="max-w-[500px] mx-auto px-6 py-14 md:py-20 flex flex-col items-center">
+    <div className="max-w-[500px] mx-auto px-6 py-8 sm:py-10 md:py-14 flex flex-col items-center">
       <div className="text-center mb-6">
         <Badge variant="outline" className="mb-2 text-xs font-mono uppercase text-[#b4532a] border-[#b4532a]/30">
           Relay Cloud · Free Preview
@@ -68,7 +68,7 @@ function ClerkAuthView({
         </p>
       </div>
 
-      <div className="w-full max-w-full overflow-x-hidden flex justify-center mb-6">
+      <div className="w-full max-w-full flex justify-center mb-6">
         {mode === 'sign-in' ? (
           <SignIn
             routing="hash"
